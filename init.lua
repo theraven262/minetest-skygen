@@ -326,7 +326,7 @@ minetest.register_globalstep(function(dtime)
 
             else
 
-                minetest.chat_send_player(player_name, "Change Init: " .. previous_biome_name .. " to " .. biome_name)
+                --minetest.chat_send_player(player_name, "Change Init: " .. previous_biome_name .. " to " .. biome_name) -- Debug
 
                 skygen.set_sky(player, biome_name)
                 skygen.init_transition(player, previous_biome_name, biome_name)
@@ -338,10 +338,3 @@ minetest.register_globalstep(function(dtime)
     end
 
 end)
-
-
-
-
-
-
-
