@@ -261,7 +261,7 @@ skygen.biomes = {
     icesheet = {
         name = "Icesheet",
         colors = {
-            {0, 73, 73}, -- Day 
+            {0, 73, 73}, -- Day
             {0, 219, 219}, -- Day Horizon
             {222, 222, 222}, -- Sun Tint
             {87, 61, 250}, -- Moon Tint
@@ -270,7 +270,7 @@ skygen.biomes = {
     icesheet_ocean = {
         name = "Icesheet",
         colors = {
-            {16, 94, 169}, -- Day 
+            {16, 94, 169}, -- Day
             {39, 152, 185}, -- Day Horizon
             {222, 222, 222}, -- Sun Tint
             {87, 61, 250}, -- Moon Tint
@@ -279,7 +279,7 @@ skygen.biomes = {
     icesheet_under = {
         name = "Underground",
         colors = {
-            {192, 192, 192}, -- Day 
+            {192, 192, 192}, -- Day
             {128, 128, 128}, -- Day Horizon
             {222, 222, 222}, -- Sun Tint
             {87, 61, 250}, -- Moon Tint
