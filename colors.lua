@@ -5,6 +5,52 @@
 -- Stars are colorized using the sun tint as well
 -- Clouds are changed in three different functions already and colorizing them would be a bit more expensive due to the required transition functions
 
+skygen.biome_names = {
+    "cold_desert",
+    "cold_desert_under",
+    "cold_desert_ocean",
+    "desert",
+    "desert_ocean",
+    "desert_under",
+    "taiga",
+    "taiga_ocean",
+    "taiga_under",
+    "snowy_grassland",
+    "snowy_grassland_under",
+    "snowy_grassland_ocean",
+    "grassland",
+    "grassland_ocean",
+    "grassland_dunes",
+    "grassland_under",
+    "coniferous_forest",
+    "coniferous_forest_dunes",
+    "coniferous_forest_ocean",
+    "coniferous_forest_under",
+    "deciduous_forest",
+    "deciduous_forest_ocean",
+    "deciduous_forest_under",
+    "deciduous_forest_shore",
+    "rainforest",
+    "rainforest_ocean",
+    "rainforest_swamp",
+    "rainforest_under",
+    "icesheet",
+    "icesheet_ocean",
+    "icesheet_under",
+    "tundra",
+    "tundra_highland",
+    "tundra_beach",
+    "tundra_ocean",
+    "tundra_under",
+    "sandstone_desert",
+    "sandstone_desert_ocean",
+    "sandstone_desert_under",
+    "savanna",
+    "savanna_shore",
+    "savanna_ocean",
+    "savanna_under"
+}
+
 skygen.biomes = {
     cold_desert = {
         name = "Cold Desert",

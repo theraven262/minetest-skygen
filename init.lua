@@ -6,10 +6,15 @@ skygen.save_timer = 0
 skygen.save_interval = 1000
 skygen.sky_state = {}
 skygen.active = true
+skygen.event = "none"
+
+skygen.events = {"test"} -- Add event names here
 
 skygen.skybox_names = {"test_sky"} -- Add skybox names here
 skygen.skyboxes = {}
+skygen.event_data = {}
 skygen.save_file = minetest.get_worldpath() .. "/skygen"
+skygen.event_save_file = minetest.get_worldpath() .. "/skygen_event"
 
 skygen.colorize_stars = true
 
@@ -18,12 +23,20 @@ local skybox_path = minetest.get_modpath("skygen") .. "/skyboxes"
 dofile(path.."/colors.lua")
 dofile(path.."/biome.lua")
 dofile(path.."/skybox.lua")
+dofile(path.."/events.lua")
 
 for i=1,#skygen.skybox_names do
     dofile(skybox_path .. "/" .. skygen.skybox_names[i] .. "/skydef.lua")
 end
 
 function skygen.load_saves()
+    local event_input = io.open(skygen.event_save_file, "r")
+    if not event_input then
+		return
+	else
+        skygen.event = event_input:read("*a")
+    end
+    event_input:close()
 	local input = io.open(skygen.save_file, "r")
 	if not input then
 		return
@@ -38,7 +51,6 @@ function skygen.load_saves()
 		skygen.sky_state[name] = state
         skygen.skybox_status[name] = skybox
 	end
-    print(dump(skygen.sky_state))
 	input:close()
 end
 
@@ -61,9 +73,21 @@ function skygen.save()
     return true
 end
 
+function skygen.event_save()
+    local data = {}
+    local output = io.open(skygen.event_save_file, "w")
+    if output then
+        output:write(skygen.event)
+        io.close(output)
+        return true
+    end
+    return true
+end
+
 skygen.load_saves()
 minetest.register_on_shutdown(function()
     skygen.save()
+    skygen.event_save()
 end)
 
 minetest.register_on_leaveplayer(function(player)
@@ -118,11 +142,34 @@ minetest.register_globalstep(function()
             biome_colors[7] = skygen.colorize(biome_colors[1], biome_colors[4], 0.75) -- Night
             biome_colors[8] = skygen.colorize(biome_colors[2], biome_colors[4], 0.75) -- Night Horizon
         end
-        skygen.sky_globalstep(players)
+        if skygen.event == "none" then
+            skygen.sky_globalstep(players)
+        else
+            for i=1,#skygen.events do
+                if skygen.event == skygen.events[i] then
+                    for i=1, #skygen.biome_names do
+                        local biome_name = skygen.biome_names[i]
+                        local biome_colors = skygen.biomes[biome_name].colors
+                        local event_biome_colors = {}
+                        event_biome_colors[1] = skygen.colorize(biome_colors[1], skygen.event_data[skygen.event].color, 0.75) -- Day
+                        event_biome_colors[2] = skygen.colorize(biome_colors[2], skygen.event_data[skygen.event].color, 0.75) -- Day Horizon
+                        event_biome_colors[3] = skygen.colorize(biome_colors[3], skygen.event_data[skygen.event].color_sun, 0.75) -- Sun
+                        event_biome_colors[4] = skygen.colorize(biome_colors[4], skygen.event_data[skygen.event].color_moon, 0.75) -- Moon
+                        event_biome_colors[5] = skygen.colorize(biome_colors[5], skygen.event_data[skygen.event].color_sun, 0.75) -- Dawn
+                        event_biome_colors[6] = skygen.colorize(biome_colors[6], skygen.event_data[skygen.event].color_sun, 0.75) -- Dawn Horizon
+                        event_biome_colors[7] = skygen.colorize(biome_colors[7], skygen.event_data[skygen.event].color_night, 0.75) -- Night
+                        event_biome_colors[8] = skygen.colorize(biome_colors[8], skygen.event_data[skygen.event].color_night, 0.75) -- Night Horizon
+                        skygen.biomes[biome_name].event_colors = event_biome_colors
+                    end
+                end
+            end
+            skygen.sky_globalstep(players)
+        end
     else
         skygen.sky_globalstep(players)
         if (skygen.save_timer > skygen.save_interval) then
             skygen.save()
+            skygen.event_save()
             skygen.save_timer = 0
         else
             skygen.save_timer = skygen.save_timer + 1
@@ -153,16 +200,40 @@ minetest.register_chatcommand("skygen", {
         end
         if parameters[1] == "off" then
             skygen.deactivate(name)
-            minetest.chat_send_player("The sky is now set to be Minetest default")
+            minetest.chat_send_player(name, "The sky is now set to be Minetest default")
         elseif parameters[1] == "biome" then
             skygen.biome_mode(name)
-            minetest.chat_send_player("The sky is now set to be biome-adaptive")
+            minetest.chat_send_player(name, "The sky is now set to be biome-adaptive")
         elseif parameters[1] == "skybox" then
             for i=1, #skygen.skybox_names do
                 if skygen.skybox_names[i] == parameters[2] then
                     local sky_description = skygen.skyboxes[parameters[2]].description
                     skygen.set_skybox(minetest.get_player_by_name(name), parameters[2])
-                    minetest.chat_send_player("The sky is now set to be a skybox, " .. sky_description)
+                    minetest.chat_send_player(name, "The sky is now set to be a skybox, " .. sky_description)
+                end
+            end
+        end
+    end
+})
+
+minetest.register_chatcommand("skygen_event", {
+    params = "<event_name>",
+    description = "Initiate an event",
+    func = function(name, param)
+        if param == "deactivate" then
+            if skygen.event ~= "none" then
+                local previous_event = skygen.event_data[skygen.event].description
+                minetest.chat_send_all("The " .. previous_event .. " has ended!")
+                skygen.event = "none"
+                skygen.start = 1
+            end
+        else
+            for i=1,#skygen.events do
+                if skygen.events[i] == param then
+                    local new_event = skygen.event_data[param].description
+                    skygen.event = param
+                    skygen.start = 1
+                    minetest.chat_send_all("The " .. new_event .. " has arrived!")
                 end
             end
         end
