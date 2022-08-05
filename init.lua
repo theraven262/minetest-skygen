@@ -11,6 +11,7 @@ skygen.event = "none"
 skygen.events = {"test"} -- Add event names here
 
 skygen.skybox_names = {"test_sky"} -- Add skybox names here
+
 skygen.skyboxes = {}
 skygen.event_data = {}
 skygen.save_file = minetest.get_worldpath() .. "/skygen"
@@ -219,6 +220,7 @@ minetest.register_chatcommand("skygen", {
 minetest.register_chatcommand("skygen_event", {
     params = "<event_name>",
     description = "Initiate an event",
+    privs = {server=true},
     func = function(name, param)
         if param == "deactivate" then
             if skygen.event ~= "none" then
