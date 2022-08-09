@@ -94,7 +94,7 @@ end)
 minetest.register_on_leaveplayer(function(player)
     if skygen.sky_state[player:get_player_name()] == "skybox" then
         skygen.sky_state[player:get_player_name()] = "skybox_reset"
-    elseif skygen.sky_state[player:get_player_name()] == "skybox" then
+    elseif skygen.sky_state[player:get_player_name()] == "inactive" then
         skygen.sky_state[player:get_player_name()] = "inactive_reset"
     end
 end)
@@ -106,7 +106,7 @@ skygen.sky_globalstep = function(players)
         if (skygen.sky_state[player_name] == "skybox_reset") then -- Player has reconnected in the meantime and the skybox has to be set anew
             skygen.set_skybox(player, skygen.skybox_status[player:get_player_name()])
         elseif (skygen.sky_state[player_name] == "inactive_reset") then
-            skygen.deactivate()
+            skygen.deactivate(player_name)
         elseif (skygen.sky_state[player_name] == "skybox") or (skygen.sky_state[player_name] == "inactive") then
         else
             local biome_data = skygen.fetch_biome(player)
