@@ -181,7 +181,7 @@ skygen.set_all = function(player, biome_name) -- For initial case
             count = (1.5 - humidity) * 4 * 10
         })
     else
-        player:set_stars()
+        player:set_stars(skygen.default_star_params)
     end
 end
 
