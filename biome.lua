@@ -84,14 +84,23 @@ skygen.transition = function(player, base_colors, base_params, color_diffs, para
             sun_texture = "sun.png"
             moon_texture = "moon.png"
         end
-        player:set_sun({
-            texture = sun_texture,
-            scale = ((heat/255) + 0.1)*2,
-        })
-        player:set_moon({
-            texture = moon_texture,
-            scale = ((heat/255) + 0.1)*4,
-        })
+        if (skygen.scale_sun_moon == "true") then
+            player:set_sun({
+                texture = sun_texture,
+                scale = ((heat/255) + 0.1)*2,
+            })
+            player:set_moon({
+                texture = moon_texture,
+                scale = ((heat/255) + 0.1)*4,
+            })
+        else
+            player:set_sun({
+                texture = sun_texture,
+            })
+            player:set_moon({
+                texture = moon_texture,
+            })
+        end
         if skygen.colorize_stars == true then
             player:set_stars({
                 star_color = {r = sun[1], g = sun[2], b = sun[3]},
@@ -149,14 +158,23 @@ skygen.set_all = function(player, biome_name) -- For initial case
         sun_texture = "sun.png"
         moon_texture = "moon.png"
     end
-    player:set_sun({
-        texture = sun_texture,
-        scale = ((heat/255) + 0.1)*2,
-    })
-    player:set_moon({
-        texture = moon_texture,
-        scale = ((heat/255) + 0.1)*4,
-    })
+    if (skygen.scale_sun_moon == "true") then
+        player:set_sun({
+            texture = sun_texture,
+            scale = ((heat/255) + 0.1)*2,
+        })
+        player:set_moon({
+            texture = moon_texture,
+            scale = ((heat/255) + 0.1)*4,
+        })
+    else
+        player:set_sun({
+            texture = sun_texture,
+        })
+        player:set_moon({
+            texture = moon_texture,
+        })
+    end
     if skygen.colorize_stars == true then
         player:set_stars({
             star_color = {r = sun[1], g = sun[2], b = sun[3]},

@@ -7,6 +7,7 @@ skygen.save_interval = 1000
 skygen.sky_state = {}
 skygen.active = true
 skygen.event = "none"
+skygen.scale_sun_moon = "true"
 
 skygen.events = {"test"} -- Add event names here
 
@@ -18,6 +19,13 @@ skygen.save_file = minetest.get_worldpath() .. "/skygen"
 skygen.event_save_file = minetest.get_worldpath() .. "/skygen_event"
 
 skygen.colorize_stars = true
+
+skygen.default_star_params = {
+    visible = "true",
+    count = 1000,
+    star_color = "#ebebff69",
+    scale = 1,
+}
 
 local path = minetest.get_modpath("skygen")
 local skybox_path = minetest.get_modpath("skygen") .. "/skyboxes"
@@ -183,7 +191,7 @@ skygen.deactivate = function(player)
     local player_obj = minetest.get_player_by_name(player)
     player_obj:set_sky()
     player_obj:set_sun()
-    player_obj:set_stars()
+    player_obj:set_stars(skygen.default_star_params)
     player_obj:set_moon()
     player_obj:set_clouds()
     player_obj:override_day_night_ratio(nil)

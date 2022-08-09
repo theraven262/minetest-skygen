@@ -95,5 +95,5 @@ skygen.biome_mode = function(player)
     player_obj:override_day_night_ratio(nil)
     player_obj:set_sun()
     player_obj:set_moon()
-    player_obj:set_stars()
+    player_obj:set_stars(skygen.default_star_params)
 end
