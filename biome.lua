@@ -4,8 +4,17 @@ skygen.previous_biome = {}
 
 skygen.transition_frames = 16
 
+local function biome_exists(biome_name)
+	if skygen.biomes[biome_name] then
+		return biome_name
+	else
+		return "grassland"
+	end
+end
+
 skygen.set_sky = function(player, biome_name)
     local base_values = {}
+    local biome_name = biome_exists(biome_name)
     if skygen.event == "none" then
         base_values = skygen.biomes[biome_name].colors
     else
@@ -29,6 +38,8 @@ skygen.set_sky = function(player, biome_name)
 end
 
 skygen.init_transition = function(player, prev_biome_name, biome_name)
+    local prev_biome_name = biome_exists(prev_biome_name)
+    local biome_name = biome_exists(biome_name)
     skygen.sky_state[player:get_player_name()] = "transition"
     local base_colors = {}
     if skygen.event == "none" then
@@ -128,6 +139,7 @@ skygen.colorize = function(color, colorizer, amount)
 end
 
 skygen.set_all = function(player, biome_name) -- For initial case
+    local biome_name = biome_exists(biome_name)
     if skygen.event == "none" then
         sun = skygen.biomes[biome_name].colors[3] -- Sun tint
         moon = skygen.biomes[biome_name].colors[4] -- Moon tint
@@ -186,6 +198,7 @@ skygen.set_all = function(player, biome_name) -- For initial case
 end
 
 skygen.set_clouds = function(player, biome_name) -- Cause minetest sets them to default every now and then
+    local biome_name = biome_exists(biome_name)
     local heat = minetest.registered_biomes[biome_name].heat_point*2.55
     local humidity = minetest.registered_biomes[biome_name].humidity_point/100
     local cloud_color = {}
@@ -203,6 +216,8 @@ skygen.set_clouds = function(player, biome_name) -- Cause minetest sets them to 
 end
 
 skygen.get_param_diffs = function(prev_biome_name, biome_name)
+    local prev_biome_name = biome_exists(prev_biome_name)
+    local biome_name = biome_exists(biome_name)
     local prev_heat = minetest.registered_biomes[prev_biome_name].heat_point
     local prev_humidity = minetest.registered_biomes[prev_biome_name].humidity_point
     local heat = minetest.registered_biomes[biome_name].heat_point
@@ -214,6 +229,8 @@ skygen.get_param_diffs = function(prev_biome_name, biome_name)
 end
 
 skygen.get_color_diffs = function(prev_biome_name, biome_name)
+    local prev_biome_name = biome_exists(prev_biome_name)
+    local biome_name = biome_exists(biome_name)
     local prev_colorset = {}
     local colorset = {}
     if skygen.event == "none" then
