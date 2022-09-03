@@ -75,7 +75,7 @@ skygen.transition = function(player, base_colors, base_params, color_diffs, para
         local sun = base_colors[1]
         local moon = base_colors[2]
         local cloud_color = {}
-        if skygen.event == "none" then    
+        if skygen.event == "none" then
             cloud_color = {r = 255, g =  255, b =  255, a = 255 * humidity}
         else
             local colorset = skygen.event_data[skygen.event].color_cloud
@@ -140,6 +140,7 @@ end
 
 skygen.set_all = function(player, biome_name) -- For initial case
     local biome_name = biome_exists(biome_name)
+    local sun, moon
     if skygen.event == "none" then
         sun = skygen.biomes[biome_name].colors[3] -- Sun tint
         moon = skygen.biomes[biome_name].colors[4] -- Moon tint
@@ -147,10 +148,10 @@ skygen.set_all = function(player, biome_name) -- For initial case
         sun = skygen.biomes[biome_name].event_colors[3] -- Sun tint
         moon = skygen.biomes[biome_name].event_colors[4] -- Moon tint
     end
-    heat = minetest.registered_biomes[biome_name].heat_point*2.55
-    humidity = minetest.registered_biomes[biome_name].humidity_point/100
+    local heat = minetest.registered_biomes[biome_name].heat_point*2.55
+    local humidity = minetest.registered_biomes[biome_name].humidity_point/100
     local cloud_color = {}
-    if skygen.event == "none" then    
+    if skygen.event == "none" then
         cloud_color = {r = 255, g =  255, b =  255, a = 255 * humidity}
     else
         local colorset = skygen.event_data[skygen.event].color_cloud
@@ -202,7 +203,7 @@ skygen.set_clouds = function(player, biome_name) -- Cause minetest sets them to 
     local heat = minetest.registered_biomes[biome_name].heat_point*2.55
     local humidity = minetest.registered_biomes[biome_name].humidity_point/100
     local cloud_color = {}
-    if skygen.event == "none" then    
+    if skygen.event == "none" then
         cloud_color = {r = 255, g =  255, b =  255, a = 255 * humidity}
     else
         local colorset = skygen.event_data[skygen.event].color_cloud
