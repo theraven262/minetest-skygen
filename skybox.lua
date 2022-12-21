@@ -1,11 +1,7 @@
--- Functions and data related to the skybox mode
-
-skygen.skybox_status = {}
-
 skygen.set_skybox = function(player, skybox)
     local name = player:get_player_name()
-    skygen.storage:set_string(name .. "_skybox", skybox)
-    skygen.storage:set_string(name .. "_sky_state", "skybox")
+    skygen.write(name, "skybox", skybox)
+    skygen.write(name, "sky_state", "skybox")
     local skybox_data = skygen.skyboxes[skybox]
     local skybox_textures = {}
     for i=1,6 do
@@ -23,7 +19,7 @@ skygen.set_skybox = function(player, skybox)
     if skybox_data.change_sun == true then
         local sun_texture
         local sunrisebg_texture
-        if skybox_data.sun_texture == "default" then
+        if (skybox_data.sun_texture == "default") or (skybox_data.sun_texture == nil) then
             sun_texture = "sun.png"
         else
             sun_texture = "skygen_" .. skybox .. "_sun.png"
@@ -44,10 +40,12 @@ skygen.set_skybox = function(player, skybox)
             visible = false,
             sunrise_visible = false,
         })
+    else
+        player:set_sun()
     end
     if skybox_data.change_moon == true then
         local moon_texture
-        if skybox_data.moon_texture == "default" then
+        if (skybox_data.moon_texture == "default") or (skybox_data.moon_texture == nil) then
             moon_texture = "moon.png"
         else
             moon_texture = "skygen_" .. skybox .. "_moon.png"
@@ -60,6 +58,8 @@ skygen.set_skybox = function(player, skybox)
         player:set_moon({
             visible = false,
         })
+    else
+        player:set_moon()
     end
     if skybox_data.change_stars == true then
         player:set_stars({
@@ -71,6 +71,8 @@ skygen.set_skybox = function(player, skybox)
         player:set_stars({
             visible = false,
         })
+    else
+        player:set_stars(skygen.default_star_parameters)
     end
     if skybox_data.change_clouds == true then
         player:set_clouds({
@@ -85,5 +87,7 @@ skygen.set_skybox = function(player, skybox)
         player:set_clouds({
             density = 0,
         })
+    else
+        player:set_clouds()
     end
 end
