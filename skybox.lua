@@ -3,8 +3,9 @@
 skygen.skybox_status = {}
 
 skygen.set_skybox = function(player, skybox)
-    skygen.skybox_status[player:get_player_name()] = skybox
-    skygen.sky_state[player:get_player_name()] = "skybox"
+    local name = player:get_player_name()
+    skygen.storage:set_string(name .. "_skybox", skybox)
+    skygen.storage:set_string(name .. "_sky_state", "skybox")
     local skybox_data = skygen.skyboxes[skybox]
     local skybox_textures = {}
     for i=1,6 do
@@ -14,14 +15,14 @@ skygen.set_skybox = function(player, skybox)
         type = "skybox",
         base_color = skybox_data.color,
         textures = skybox_textures,
-        clouds =  skybox_data.clouds,         
+        clouds =  skybox_data.clouds,
     })
     if skybox_data.time ~= nil then
         player:override_day_night_ratio(skybox_data.time / 12000)
     end
     if skybox_data.change_sun == true then
-        local sun_texture = ""
-        local sunrisebg_texture = ""
+        local sun_texture
+        local sunrisebg_texture
         if skybox_data.sun_texture == "default" then
             sun_texture = "sun.png"
         else
@@ -45,7 +46,7 @@ skygen.set_skybox = function(player, skybox)
         })
     end
     if skybox_data.change_moon == true then
-        local moon_texture = ""
+        local moon_texture
         if skybox_data.moon_texture == "default" then
             moon_texture = "moon.png"
         else
@@ -85,15 +86,4 @@ skygen.set_skybox = function(player, skybox)
             density = 0,
         })
     end
-end
-
-skygen.biome_mode = function(player)
-    skygen.skybox_status[player] = "none"
-    skygen.sky_state[player] = "biome"
-    skygen.previous_biome[player] = nil
-    player_obj = minetest.get_player_by_name(player)
-    player_obj:override_day_night_ratio(nil)
-    player_obj:set_sun()
-    player_obj:set_moon()
-    player_obj:set_stars(skygen.default_star_params)
 end

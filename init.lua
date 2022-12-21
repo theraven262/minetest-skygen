@@ -1,34 +1,38 @@
 -- Dont forget to set cloud radius to 26 in minetest's settings
 
 skygen = {}
+skygen.storage = minetest.get_mod_storage()
 skygen.start = 1
 skygen.save_timer = 0
 skygen.save_interval = 1000
 skygen.sky_state = {}
 skygen.active = true
-skygen.event = "none"
 skygen.scale_sun_moon = "true"
+
+skygen.sky_biome_start = 1024
 
 skygen.events = {"test"} -- Add event names here
 
 skygen.skybox_names = {"test_sky"} -- Add skybox names here
+if (minetest.get_game_info().id == "edgy-dark-ominous-game") then
+    skygen.edgy_skyboxes = {"sky"}
+    table.insert_all(skygen.skybox_names, skygen.edgy_skyboxes)
+end
 
 skygen.skyboxes = {}
 skygen.event_data = {}
-skygen.save_file = minetest.get_worldpath() .. "/skygen"
-skygen.event_save_file = minetest.get_worldpath() .. "/skygen_event"
 
 skygen.colorize_stars = true
 
 skygen.default_star_params = {
-    visible = "true",
+    visible = true,
     count = 1000,
     star_color = "#ebebff69",
     scale = 1,
 }
 
 local path = minetest.get_modpath("skygen")
-local skybox_path = minetest.get_modpath("skygen") .. "/skyboxes"
+local skybox_path = path .. "/textures/skyboxes"
 dofile(path.."/colors.lua")
 dofile(path.."/biome.lua")
 dofile(path.."/skybox.lua")
@@ -38,72 +42,66 @@ for i=1,#skygen.skybox_names do
     dofile(skybox_path .. "/" .. skygen.skybox_names[i] .. "/skydef.lua")
 end
 
-function skygen.load_saves()
-    local event_input = io.open(skygen.event_save_file, "r")
-    if not event_input then
-		return
-	else
-        skygen.event = event_input:read("*a")
+if skygen.storage:get_string("event") == "" then
+    skygen.storage:set_string("event", "none")
+end
+
+minetest.register_on_joinplayer(function(player)
+    local name = player:get_player_name()
+    -- Recovery Variables
+    if skygen.storage:get_string(name .. "_sky_state") == "skybox" then
+        skygen.storage:set_string(name .. "_sky_state", "skybox_reset")
+    elseif skygen.storage:get_string(name .. "_sky_state") == "inactive" then
+        skygen.storage:set_string(name .. "_sky_state", "inactive_reset")
+    elseif skygen.storage:get_string(name .. "_sky_state") == "transition" then
+        skygen.storage:set_string(name .. "_sky_state", "biome")
     end
-    event_input:close()
-	local input = io.open(skygen.save_file, "r")
-	if not input then
-		return
-	end
-	-- Iterate over all recorded states in the format "player state skybox" for each line
-	for name, state, skybox in input:read("*a"):gmatch("([%w_-]+)%s([%w_-]+)%s([%w_-]+)[\r\n]") do
-        if state == "skybox" then
-            state = "skybox_reset"
-        elseif state == "inactive" then
-            state = "inactive_reset"
+    -- Init variables
+    if (minetest.get_game_info().id == "edgy-dark-ominous-game") then -- Initially spawn with the sky skybox
+        if skygen.storage:get_string(name .. "_sky_state") == "" then
+            skygen.storage:set_string(name .. "_sky_state", "skybox_reset")
         end
-		skygen.sky_state[name] = state
-        skygen.skybox_status[name] = skybox
-	end
-	input:close()
-end
-
-function skygen.save()
-    local data = {}
-    local output = io.open(skygen.save_file, "w")
-    if output then
-        local s = ""
-        for i, v in pairs(skygen.sky_state) do
-            s = skygen.skybox_status[i]
-            if not s then
-                s = "none"
-            end
-            table.insert(data, string.format("%s %s %s\n", i, v, s))
+        if skygen.storage:get_string(name .. "_skybox") == "" then
+            skygen.storage:set_string(name .. "_skybox", "sky")
         end
-        output:write(table.concat(data))
-        io.close(output)
-        return true
+    else
+        if skygen.storage:get_string(name .. "_sky_state") == "" then
+            skygen.storage:set_string(name .. "_sky_state", "biome")
+        end
+        if skygen.storage:get_string(name .. "_skybox") == "" then
+            skygen.storage:set_string(name .. "_skybox", "none")
+        end
     end
-    return true
-end
-
-function skygen.event_save()
-    local data = {}
-    local output = io.open(skygen.event_save_file, "w")
-    if output then
-        output:write(skygen.event)
-        io.close(output)
-        return true
+    if skygen.storage:get_string(name .. "_backup_state") == "" then
+        skygen.storage:set_string(name .. "_backup_state", "biome")
     end
-    return true
-end
-
-skygen.load_saves()
-minetest.register_on_shutdown(function()
-    skygen.save()
-    skygen.event_save()
+    if skygen.storage:get_string(name .. "_backup_skybox") == "" then
+        skygen.storage:set_string(name .. "_backup_skybox", "none")
+    end
+    -- Customization Variables
+    if skygen.storage:get_string(name .. "_star_coloring") == "" then
+        skygen.storage:set_string(name .. "_star_coloring", "true")
+    end
+    if skygen.storage:get_string(name .. "_scaling") == "" then
+        skygen.storage:set_string(name .. "_scaling", "true")
+    end
+    if skygen.storage:get_int(name .. "_shadow_intensity") == "" then
+        skygen.storage:set_int(name .. "_shadow_intensity", 0.33)
+    end
+    if (skygen.storage:get_string(name .. "_sky_state") == "") then
+        skygen.storage:set_string(name .. "_sky_state", "biome")
+    end
+    player:set_lighting({ shadows = { intensity = skygen.storage:get_int(name .. "_shadow_intensity") } })
 end)
 
 minetest.register_on_leaveplayer(function(player)
-    if skygen.sky_state[player:get_player_name()] == "skybox" then
-        skygen.sky_state[player:get_player_name()] = "skybox_reset"
-    elseif skygen.sky_state[player:get_player_name()] == "inactive" then
-        skygen.sky_state[player:get_player_name()] = "inactive_reset"
+    local name = player:get_player_name()
+    if skygen.storage:get_string(name .. "_sky_state") == "skybox" then
+        skygen.storage:set_string(name .. "_sky_state", "skybox_reset")
+    elseif skygen.storage:get_string(name .. "_sky_state") == "inactive" then
+        skygen.storage:set_string(name .. "_sky_state", "inactive_reset")
+    elseif skygen.storage:get_string(name .. "_sky_state") == "transition" then
+        skygen.storage:set_string(name .. "_sky_state", "biome")
     end
 end)
 
@@ -111,21 +109,42 @@ skygen.sky_globalstep = function(players)
     for i=1, #players do
         local player = players[i]
         local player_name = player:get_player_name()
-        if (skygen.sky_state[player_name] == "skybox_reset") then -- Player has reconnected in the meantime and the skybox has to be set anew
-            skygen.set_skybox(player, skygen.skybox_status[player:get_player_name()])
-        elseif (skygen.sky_state[player_name] == "inactive_reset") then
+        local sky_state = skygen.storage:get_string(player_name .. "_sky_state")
+        local active_skybox = skygen.storage:get_string(player_name .. "_skybox")
+
+        -- Sky Biome Override
+        if (minetest.get_game_info().id == "edgy-dark-ominous-game") then
+            local playheight = player:get_pos().y
+            if (playheight > skygen.sky_biome_start) then
+                if (active_skybox == "sky") and (sky_state == "skybox") then
+                    return
+                elseif (sky_state == "skybox_reset") then
+                    skygen.set_skybox(player, "sky")
+                    return
+                else
+                    skygen.save_on_override(player)
+                    skygen.set_skybox(player, "sky")
+                end
+            elseif (playheight < skygen.sky_biome_start) then
+                if (active_skybox == "sky") and (sky_state == "skybox") then
+                    skygen.recover_from_override(player)
+                end
+            end
+        end
+
+        -- The Loop
+        if (sky_state == "skybox_reset") then
+            skygen.set_skybox(player, skygen.storage:get_string(player_name .. "_skybox"))
+            return
+        elseif (sky_state == "inactive_reset") then
             skygen.deactivate(player_name)
-        elseif (skygen.sky_state[player_name] == "skybox") or (skygen.sky_state[player_name] == "inactive") then
-        else
+            return
+        elseif (sky_state == "biome") then
             local biome_data = skygen.fetch_biome(player)
             local biome_name = biome_data[1]
             local previous_biome_name = skygen.previous_biome[player_name]
-            if (skygen.sky_state[player_name] == nil) then
-                skygen.sky_state[player_name] = "biome"
-            end
-            if skygen.sky_state[player_name] == "transition" then
-            elseif biome_name == previous_biome_name then
-                skygen.set_clouds(player, biome_name) -- Cause minetest resets them every now and then
+            if previous_biome_name == biome_name then
+                return
             elseif previous_biome_name == nil then
                 skygen.previous_biome[player_name] = biome_name
                 skygen.set_sky(player, biome_name)
@@ -141,53 +160,84 @@ end
 
 minetest.register_globalstep(function()
     local players = minetest.get_connected_players()
-    if skygen.start == 1 then -- Build the virtual table
+    if skygen.start == 1 then
         skygen.start = 0
-        for i=1, #skygen.biome_names do
-            local biome_name = skygen.biome_names[i]
-            local biome_colors = skygen.biomes[biome_name].colors
-            biome_colors[5] = skygen.colorize(biome_colors[2], biome_colors[3], 0.75) -- Dawn
-            biome_colors[6] = skygen.colorize(biome_colors[1], biome_colors[3], 0.75) -- Dawn Horizon
-            biome_colors[7] = skygen.colorize(biome_colors[1], biome_colors[4], 0.75) -- Night
-            biome_colors[8] = skygen.colorize(biome_colors[2], biome_colors[4], 0.75) -- Night Horizon
-        end
-        if skygen.event == "none" then
-            skygen.sky_globalstep(players)
-        else
-            for i=1,#skygen.events do
-                if skygen.event == skygen.events[i] then
-                    for i=1, #skygen.biome_names do
-                        local biome_name = skygen.biome_names[i]
-                        local biome_colors = skygen.biomes[biome_name].colors
-                        local event_biome_colors = {}
-                        event_biome_colors[1] = skygen.colorize(biome_colors[1], skygen.event_data[skygen.event].color, 0.75) -- Day
-                        event_biome_colors[2] = skygen.colorize(biome_colors[2], skygen.event_data[skygen.event].color, 0.75) -- Day Horizon
-                        event_biome_colors[3] = skygen.colorize(biome_colors[3], skygen.event_data[skygen.event].color_sun, 0.75) -- Sun
-                        event_biome_colors[4] = skygen.colorize(biome_colors[4], skygen.event_data[skygen.event].color_moon, 0.75) -- Moon
-                        event_biome_colors[5] = skygen.colorize(biome_colors[5], skygen.event_data[skygen.event].color_sun, 0.75) -- Dawn
-                        event_biome_colors[6] = skygen.colorize(biome_colors[6], skygen.event_data[skygen.event].color_sun, 0.75) -- Dawn Horizon
-                        event_biome_colors[7] = skygen.colorize(biome_colors[7], skygen.event_data[skygen.event].color_night, 0.75) -- Night
-                        event_biome_colors[8] = skygen.colorize(biome_colors[8], skygen.event_data[skygen.event].color_night, 0.75) -- Night Horizon
-                        skygen.biomes[biome_name].event_colors = event_biome_colors
-                    end
-                end
-            end
-            skygen.sky_globalstep(players)
-        end
-    else
-        skygen.sky_globalstep(players)
-        if (skygen.save_timer > skygen.save_interval) then
-            skygen.save()
-            skygen.event_save()
-            skygen.save_timer = 0
-        else
-            skygen.save_timer = skygen.save_timer + 1
-        end
+        skygen.build_color_tables()
     end
+    skygen.sky_globalstep(players)
 end)
 
+skygen.save_on_override = function(player)
+    local player_name = player:get_player_name()
+    local sky_state = skygen.storage:get_string(player_name .. "_sky_state")
+    local saved_state
+    if sky_state == "skybox" then
+        saved_state = "skybox_reset"
+        local backup_skybox = skygen.storage:get_string(player_name .. "_skybox")
+        skygen.storage:set_string(player_name .. "_backup_skybox", backup_skybox)
+    elseif sky_state == "inactive" then
+        saved_state = "inactive_reset"
+    elseif sky_state == "transition" then -- If the player originally spawns in the override
+        saved_state = "biome"
+    else
+        saved_state = sky_state
+    end
+    skygen.storage:set_string(player_name .. "_backup_state", saved_state) -- Save the selection before the override
+end
+
+skygen.recover_from_override = function(player)
+    local player_name = player:get_player_name()
+    local backup_state = skygen.storage:get_string(player_name .. "_backup_state")
+    local backup_skybox = skygen.storage:get_string(player_name .. "_backup_skybox")
+    skygen.storage:set_string(player_name .. "_sky_state", backup_state) -- Apply selection from before the override
+    if backup_state == "skybox_reset" then -- Saved skybox in this case (state saved as skybox_reset above)
+        skygen.storage:set_string(player_name .. "_skybox", backup_skybox)
+    else
+        skygen.storage:set_string(player_name .. "_skybox", "none")
+    end
+    if skygen.storage:get_string(player_name .. "_backup_state") == "biome"  then
+        skygen.biome_mode(player_name)
+    end
+end
+
+skygen.build_color_tables = function()
+    for i=1, #skygen.biome_names do
+        local biome_name = skygen.biome_names[i]
+        local biome_colors = skygen.biomes[biome_name].colors
+        if not (biome_colors[5]) then
+            biome_colors[5] = {128, 128, 128}
+        end
+        biome_colors[6] = skygen.colorize(biome_colors[2], biome_colors[3], 0.75) -- Dawn
+        biome_colors[7] = skygen.colorize(biome_colors[1], biome_colors[3], 0.75) -- Dawn Horizon
+        biome_colors[8] = skygen.colorize(biome_colors[1], biome_colors[4], 0.75) -- Night
+        biome_colors[9] = skygen.colorize(biome_colors[2], biome_colors[4], 0.75) -- Night Horizon
+    end
+    if skygen.storage:get_string("event") ~= "none" then
+        for i=1,#skygen.events do
+            if skygen.storage:get_string("event") == skygen.events[i] then
+                for j=1, #skygen.biome_names do
+                    local event = skygen.storage:get_string("event")
+                    local biome_name = skygen.biome_names[j]
+                    local biome_colors = skygen.biomes[biome_name].colors
+                    local event_biome_colors = {}
+                    event_biome_colors[1] = skygen.colorize(biome_colors[1], skygen.event_data[event].color, 0.5) -- Day
+                    event_biome_colors[2] = skygen.colorize(biome_colors[2], skygen.event_data[event].color, 0.5) -- Day Horizon
+                    event_biome_colors[3] = skygen.colorize(biome_colors[3], skygen.event_data[event].color_sun, 0.5) -- Sun
+                    event_biome_colors[4] = skygen.colorize(biome_colors[4], skygen.event_data[event].color_moon, 0.5) -- Moon
+                    event_biome_colors[5] = skygen.colorize(biome_colors[5], skygen.event_data[event].color, 0.5) -- Indoors
+                    event_biome_colors[6] = skygen.colorize(biome_colors[6], skygen.event_data[event].color_sun, 0.5) -- Dawn
+                    event_biome_colors[7] = skygen.colorize(biome_colors[7], skygen.event_data[event].color_sun, 0.5) -- Dawn Horizon
+                    event_biome_colors[8] = skygen.colorize(biome_colors[8], skygen.event_data[event].color_night, 0.5) -- Night
+                    event_biome_colors[9] = skygen.colorize(biome_colors[9], skygen.event_data[event].color_night, 0.5) -- Night Horizon
+                    skygen.biomes[biome_name].event_colors = event_biome_colors
+                end
+            end
+        end
+    end
+end
+
 skygen.deactivate = function(player)
-    skygen.sky_state[player] = "inactive"
+    skygen.storage:set_string(player .. "_sky_state", "inactive")
     local player_obj = minetest.get_player_by_name(player)
     player_obj:set_sky()
     player_obj:set_sun()
@@ -221,6 +271,23 @@ minetest.register_chatcommand("skygen", {
                     minetest.chat_send_player(name, "The sky is now set to be a skybox, " .. sky_description)
                 end
             end
+        elseif parameters[1] == "shadow" then
+            skygen.storage:set_int(name .. "_shadow_intensity", parameters[2])
+            minetest.get_player_by_name(name):set_lighting({
+                shadows = { intensity = parameters[2] }
+            })
+        elseif parameters[1] == "toggle_star_color" then
+            if skygen.storage:get_string(name .. "_star_coloring") == "true" then
+                skygen.storage:set_string(name .. "_star_coloring", "false")
+            elseif skygen.storage:get_string(name .. "_star_coloring") == "false" then
+                skygen.storage:set_string(name .. "_star_coloring", "true")
+            end
+        elseif parameters[1] == "toggle_scaling" then
+            if skygen.storage:get_string(name .. "_scaling") == "true" then
+                skygen.storage:set_string(name .. "_scaling", "false")
+            elseif skygen.storage:get_string(name .. "_scaling") == "false" then
+                skygen.storage:set_string(name .. "_scaling", "true")
+            end
         end
     end
 })
@@ -231,17 +298,17 @@ minetest.register_chatcommand("skygen_event", {
     privs = {server=true},
     func = function(name, param)
         if param == "deactivate" then
-            if skygen.event ~= "none" then
-                local previous_event = skygen.event_data[skygen.event].description
+            if skygen.storage:get_string("event") ~= "none" then
+                local previous_event = skygen.event_data[skygen.storage:get_string("event")].description
                 minetest.chat_send_all("The " .. previous_event .. " has ended!")
-                skygen.event = "none"
+                skygen.storage:set_string("event", "none")
                 skygen.start = 1
             end
         else
             for i=1,#skygen.events do
                 if skygen.events[i] == param then
                     local new_event = skygen.event_data[param].description
-                    skygen.event = param
+                    skygen.storage:set_string("event", param)
                     skygen.start = 1
                     minetest.chat_send_all("The " .. new_event .. " has arrived!")
                 end

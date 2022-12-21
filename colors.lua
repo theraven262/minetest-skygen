@@ -7,48 +7,40 @@
 
 skygen.biome_names = {
     "cold_desert",
-    "cold_desert_under",
     "cold_desert_ocean",
     "desert",
     "desert_ocean",
-    "desert_under",
     "taiga",
     "taiga_ocean",
-    "taiga_under",
     "snowy_grassland",
-    "snowy_grassland_under",
     "snowy_grassland_ocean",
     "grassland",
     "grassland_ocean",
     "grassland_dunes",
-    "grassland_under",
     "coniferous_forest",
     "coniferous_forest_dunes",
     "coniferous_forest_ocean",
-    "coniferous_forest_under",
     "deciduous_forest",
     "deciduous_forest_ocean",
-    "deciduous_forest_under",
     "deciduous_forest_shore",
     "rainforest",
     "rainforest_ocean",
     "rainforest_swamp",
-    "rainforest_under",
     "icesheet",
     "icesheet_ocean",
-    "icesheet_under",
     "tundra",
     "tundra_highland",
     "tundra_beach",
     "tundra_ocean",
-    "tundra_under",
     "sandstone_desert",
     "sandstone_desert_ocean",
-    "sandstone_desert_under",
     "savanna",
     "savanna_shore",
     "savanna_ocean",
-    "savanna_under"
+    "chalk_grassland",
+    "chalk_grassland_ocean",
+    "underground",
+    "hell"
 }
 
 skygen.biomes = {
@@ -136,8 +128,8 @@ skygen.biomes = {
     snowy_grassland = {
         name = "Snowy Grassland",
         colors = {
-            {164, 164, 164}, -- Day
-            {255, 165, 165}, -- Day Horizon
+            {192, 112, 172}, -- Day
+            {180, 164, 204}, -- Day Horizon
             {214, 241, 254}, -- Sun Tint
             {87, 61, 250}, -- Moon Tint
         }
@@ -437,6 +429,44 @@ skygen.biomes = {
             {128, 128, 128}, -- Day Horizon
             {170, 24, 0}, -- Sun Tint
             {53, 29, 75}, -- Moon Tint
+        }
+    },
+    chalk_grassland = {
+        name = "Chalk Grassland",
+        colors = {
+            {48, 48, 48}, -- Day
+            {75, 74, 70}, -- Day Horizon
+            {79, 63, 28}, -- Sun Tint
+            {51, 53, 81}, -- Moon Tint
+        }
+    },
+    chalk_grassland_ocean = {
+        name = "Chalk Grassland",
+        colors = {
+            {50, 50, 50}, -- Day
+            {13, 44, 72}, -- Day Horizon
+            {79, 63, 28}, -- Sun Tint
+            {51, 53, 81}, -- Moon Tint
+        }
+    },
+    underground = {
+        name = "Underground",
+        colors = {
+            {240, 240, 240}, -- Day
+            {192, 192, 192}, -- Day Horizon
+            {230, 230, 230}, -- Sun Tint
+            {160, 160, 160}, -- Moon Tint
+            {0, 0, 0}, -- Indoors
+        }
+    },
+    hell = {
+        name = "Hell",
+        colors = {
+            {93, 13, 0}, -- Day
+            {38, 9, 0}, -- Day Horizon
+            {93, 13, 0}, -- Sun Tint
+            {27, 9, 0}, -- Moon Tint
+            {71, 8, 0}, -- Indoors
         }
     },
 }
