@@ -56,7 +56,7 @@ end
 
 function skygen.deactivate(name)
     local player = minetest.get_player_by_name(name)
-    skygen.write(player, "sky_state", "inactive")
+    skygen.write(name, "sky_state", "inactive")
     player:set_sky()
     player:set_sun()
     player:set_stars(skygen.default_star_params)
