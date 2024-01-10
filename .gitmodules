@@ -1,3 +1,3 @@
 [submodule "textures/skyboxes"]
 	path = textures/skyboxes
-	url = git@github.com:theraven262/minetest-skygen-skyboxes.git
+	url = https://github.com/theraven262/minetest-skygen-skyboxes.git
