@@ -15,8 +15,14 @@ function skygen.set_biome_sky(player, biome_name)
         if skygen.storage:get_string("event") ~= "none" then
             fog_color = skygen.biomes[biome_name].event_colors.fog
         end
-        local fog_distance = skygen.biomes[biome_name].fog_distance
-        local fog_start = skygen.biomes[biome_name].fog_start
+        local fog_distance = -1
+        local fog_start = -1
+        if (skygen.biomes[biome_name].fog_distance) then
+            fog_distance = skygen.biomes[biome_name].fog_distance
+        end
+        if (skygen.biomes[biome_name].fog_start) then
+            fog_start = skygen.biomes[biome_name].fog_start
+        end
         player:set_sky({
             fog = {
                 fog_distance = fog_distance,
