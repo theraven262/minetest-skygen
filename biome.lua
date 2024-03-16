@@ -9,6 +9,22 @@ function skygen.set_biome_sky(player, biome_name)
     local moon_texture = "moon.png"
     local sun_scale = 1.0
     local moon_scale = 1.0
+    local fog = skygen.biomes[biome_name].colors.fog
+    if fog then
+        local fog_color = skygen.biomes[biome_name].colors.fog
+        if skygen.storage:get_string("event") ~= "none" then
+            fog_color = skygen.biomes[biome_name].event_colors.fog
+        end
+        local fog_distance = skygen.biomes[biome_name].fog_distance
+        local fog_start = skygen.biomes[biome_name].fog_start
+        player:set_sky({
+            fog = {
+                fog_distance = fog_distance,
+                fog_start = fog_start,
+                fog_color = fog_color,
+            }
+        })
+    end
     if skygen.storage:get_string("event") ~= "none" then
         sun_tint = skygen.biomes[biome_name].event_colors.sun_tint
         cloud_color = skygen.event_data[skygen.storage:get_string("event")].color_cloud
