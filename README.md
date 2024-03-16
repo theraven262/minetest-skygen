@@ -8,6 +8,7 @@ Is a minetest mod that changes the sky based on the player's current biome (plus
 - Setting the star amount according to biome's _humidity_
 - Star colorization
 - Cloud resizing according to biome's _humidity_
+- Fog control
 - Smooth transitions when changing the above
 - Per-player skybox handling
 - Activates minetest's dynamic shadows and allows tweaking intensity
@@ -41,12 +42,17 @@ A color definition is appended to the `skygen.colors` table and looks like the f
 >            sun_tint    = {r=222,g=99,b=0},
 >            moon_tint   = {r=18,g=103,b=182},
 >            indoors     = {r=128,g=128,b=128},
+>            fog     = {r=128,g=128,b=128},
 >        }
+>        fog_distance = -1
+>        fog_start = -1
 >     } 
 
 The key has to be the same as the biome name that the color definition corresponds to.
 
 If your biome is unknown to skygen, it will color its sky with the definition specified in the `skygen.fallback_biome` variable.
+
+Fog distance and color are also set in this table, the values provided in this manner are given directly to minetest's set_sky method.
 
 ### Adding custom skyboxes
 The skybox name has to be added to the `skygen.skybox_names` table in order for your skybox to be visible to SkyGen.
