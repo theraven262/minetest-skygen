@@ -42,7 +42,7 @@ A color definition is appended to the `skygen.colors` table and looks like the f
 >            sun_tint    = {r=222,g=99,b=0},
 >            moon_tint   = {r=18,g=103,b=182},
 >            indoors     = {r=128,g=128,b=128},
->            fog     = {r=128,g=128,b=128},
+>            fog         = {r=128,g=128,b=128},
 >        }
 >        fog_distance = -1
 >        fog_start = -1
