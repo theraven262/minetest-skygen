@@ -581,7 +581,7 @@ skygen.biomes = {
             indoors     = {r=79,g=63,b=194},
             fog         = {r=79,g=63,b=194},
         },
-        fog_distance = 250,
+        fog_distance = 200,
         fog_start = 0,
     },
     mushroom = {
