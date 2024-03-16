@@ -48,6 +48,21 @@ function skygen.set_sky_colors(player, biome_name)
     if skygen.storage:get_string("event") ~= "none" then
         base_values = skygen.biomes[biome_name].event_colors
     end
+
+    local fog_distance = -1
+    local fog_start = -1
+    if (skygen.biomes[biome_name].fog_distance) then
+        fog_distance = skygen.biomes[biome_name].fog_distance
+    end
+    if (skygen.biomes[biome_name].fog_start) then
+        fog_start = skygen.biomes[biome_name].fog_start
+    end
+
+    local fog_color = {r = 0, g = 0, b = 0}
+    if (base_values.fog) then
+        fog_color = base_values.fog
+    end
+
     player:set_sky({
         type = "regular",
         sky_color = {
@@ -61,6 +76,11 @@ function skygen.set_sky_colors(player, biome_name)
             fog_sun_tint    = base_values.sun_tint,
             fog_moon_tint   = base_values.moon_tint,
             fog_tint_type   = "custom"
+        },
+        fog = {
+            fog_distance = fog_distance,
+            fog_start = fog_start,
+            fog_color = fog_color
         }
     })
 end

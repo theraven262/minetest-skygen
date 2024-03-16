@@ -151,6 +151,11 @@ function skygen.build_event_colors(biome_name)
     local event_night_col = skygen.event_data[event].color_night
     local event_biome_colors = {}
     local amount = skygen.event_colorizer_intensity
+
+    if (biome_colors.fog) then
+        event_biome_colors.fog = skygen.colorize(biome_colors.fog, event_main_col, amount)
+    end
+
     event_biome_colors.day              = skygen.colorize(biome_colors.day,             event_main_col, amount)
     event_biome_colors.day_horizon      = skygen.colorize(biome_colors.day_horizon,     event_main_col, amount)
     event_biome_colors.sun_tint         = skygen.colorize(biome_colors.sun_tint,        event_sun_col, amount)
