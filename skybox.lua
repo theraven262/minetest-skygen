@@ -7,11 +7,28 @@ skygen.set_skybox = function(player, skybox)
     for i=1,6 do
         skybox_textures[i] = "skygen_" .. skybox .. i .. ".png"
     end
+    local fog_distance = -1
+    local fog_start = -1
+    local fog_color = {r=0,g=0,b=0}
+    if skybox_data.fog_distance then
+        fog_distance = skybox_data.fog_distance
+    end
+    if skybox_data.fog_start then
+        fog_start = skybox_data.fog_start
+    end
+    if skybox_data.fog_color then
+        fog_color = skybox_data.fog_color
+    end
     player:set_sky({
         type = "skybox",
         base_color = skybox_data.color,
         textures = skybox_textures,
         clouds =  skybox_data.clouds,
+        fog = {
+            fog_distance = fog_distance,
+            fog_start = fog_start,
+            fog_color = fog_color
+        }
     })
     if skybox_data.time ~= nil then
         player:override_day_night_ratio(skybox_data.time / 12000)
