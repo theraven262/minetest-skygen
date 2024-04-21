@@ -30,6 +30,14 @@ function skygen.set_biome_sky(player, biome_name)
                 fog_color = fog_color,
             }
         })
+    else
+        player:set_sky({
+            fog = {
+                fog_distance = -1,
+                fog_start = -1,
+                fog_color = "#00000000",
+            }
+        })
     end
     if skygen.storage:get_string("event") ~= "none" then
         sun_tint = skygen.biomes[biome_name].event_colors.sun_tint
