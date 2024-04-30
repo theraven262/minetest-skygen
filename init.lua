@@ -56,6 +56,7 @@ end
 
 minetest.register_on_joinplayer(function(player)
     local name = player:get_player_name()
+    skygen.active_biome[name] = nil
     -- In case of a server crash
     if skygen.read(name, "sky_state") == "transition" then
         skygen.write(name, "sky_state", "biome")
