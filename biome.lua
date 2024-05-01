@@ -149,6 +149,7 @@ end
 function skygen.loop_transition(player, base_data, diff_data, biome, step)
     if step > skygen.biome_transition_frames then
         skygen.write(player:get_player_name(), "sky_state", "biome")
+        skygen.set_biome_sky(player, biome)
         skygen.active_biome[player:get_player_name()] = biome
     else
         step = step + 1
