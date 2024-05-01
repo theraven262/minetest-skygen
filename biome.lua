@@ -9,36 +9,7 @@ function skygen.set_biome_sky(player, biome_name)
     local moon_texture = "moon.png"
     local sun_scale = 1.0
     local moon_scale = 1.0
-    local fog = skygen.biomes[biome_name].colors.fog
-    if fog then
-        local fog_color = skygen.biomes[biome_name].colors.fog
-        if skygen.storage:get_string("event") ~= "none" then
-            fog_color = skygen.biomes[biome_name].event_colors.fog
-        end
-        local fog_distance = -1
-        local fog_start = -1
-        if (skygen.biomes[biome_name].fog_distance) then
-            fog_distance = skygen.biomes[biome_name].fog_distance
-        end
-        if (skygen.biomes[biome_name].fog_start) then
-            fog_start = skygen.biomes[biome_name].fog_start
-        end
-        player:set_sky({
-            fog = {
-                fog_distance = fog_distance,
-                fog_start = fog_start,
-                fog_color = fog_color,
-            }
-        })
-    else
-        player:set_sky({
-            fog = {
-                fog_distance = -1,
-                fog_start = -1,
-                fog_color = "#00000000",
-            }
-        })
-    end
+
     if skygen.storage:get_string("event") ~= "none" then
         sun_tint = skygen.biomes[biome_name].event_colors.sun_tint
         cloud_color = skygen.event_data[skygen.storage:get_string("event")].color_cloud
@@ -101,13 +72,31 @@ function skygen.set_sky_colors(player, biome_name)
             fog_sun_tint    = base_values.sun_tint,
             fog_moon_tint   = base_values.moon_tint,
             fog_tint_type   = "custom"
-        },
-        fog = {
-            fog_distance = fog_distance,
-            fog_start = fog_start,
-            -- fog_color is interpolated
         }
     })
+
+    local fog = skygen.biomes[biome_name].colors.fog
+    if fog then
+        local fog_color = skygen.biomes[biome_name].colors.fog
+        if skygen.storage:get_string("event") ~= "none" then
+            fog_color = skygen.biomes[biome_name].event_colors.fog
+        end
+        player:set_sky({
+            fog = {
+                fog_distance = fog_distance,
+                fog_start = fog_start,
+                fog_color = fog_color,
+            }
+        })
+    else
+        player:set_sky({
+            fog = {
+                fog_distance = -1,
+                fog_start = -1,
+                fog_color = "#00000000",
+            }
+        })
+    end
 end
 
 function skygen.init_transition(player, prev_biome_name, biome_name)
