@@ -121,7 +121,7 @@ function skygen.init_transition(player, prev_biome_name, biome_name)
             if timeofday == "day" then
                 base_data.fog = skygen.biomes[prev_biome_name].colors.day_horizon
             else
-                base_data.fog = skygen.biomes[prev_biome_name].colors.night_horizon
+                base_data.fog = skygen.colorize(skygen.biomes[prev_biome_name].colors.night_horizon, {r=0,g=0,b=0}, skygen.night_darken_amount)
             end
         end
     else
@@ -133,7 +133,7 @@ function skygen.init_transition(player, prev_biome_name, biome_name)
             if timeofday == "day" then
                 base_data.fog = skygen.biomes[prev_biome_name].event_colors.day_horizon
             else
-                base_data.fog = skygen.biomes[prev_biome_name].event_colors.night_horizon
+                base_data.fog = skygen.colorize(skygen.biomes[prev_biome_name].event_colors.night_horizon, {r=0,g=0,b=0}, skygen.night_darken_amount)
             end
         end
     end
@@ -143,6 +143,7 @@ function skygen.init_transition(player, prev_biome_name, biome_name)
     diff_data.heat, diff_data.humidity = skygen.get_param_diffs(prev_biome_name, biome_name)
 
     local transition_start = 0
+    skygen.set_biome_sky(player, prev_biome_name)
     skygen.loop_transition(player, base_data, diff_data, biome_name, transition_start)
 end
 
@@ -234,6 +235,13 @@ function skygen.get_color_diffs(prev_biome_name, biome_name)
     if (minetest.get_timeofday() > 0.25) and (minetest.get_timeofday() < 0.75) then
         timeofday = "day"
     end
+    print("Calculating transition from " .. prev_biome_name .. " to " .. biome_name .. "\n")
+    if fog then
+        print("Fog value is " .. dump(fog))
+    end
+    if fog_prev then
+        print("Previous fog value is " .. dump(fog_prev))
+    end
     -- [Fog Interpolation]
     -- If the previous biome has fog and the next biome has fog then simply interpolate
     -- If one of the biomes doesn't have fog, but the other does, then the interpolation is more complex:
@@ -243,47 +251,49 @@ function skygen.get_color_diffs(prev_biome_name, biome_name)
     if skygen.storage:get_string("event") == "none" then
         prev_colorset.sun_tint = skygen.biomes[prev_biome_name].colors.sun_tint
         prev_colorset.moon_tint = skygen.biomes[prev_biome_name].colors.moon_tint
+        colorset.sun_tint = skygen.biomes[biome_name].colors.sun_tint
+        colorset.moon_tint = skygen.biomes[biome_name].colors.moon_tint
         if fog_prev then
             prev_colorset.fog = skygen.biomes[prev_biome_name].colors.fog
-        elseif fog then
+        else
             if timeofday == "day" then
                 prev_colorset.fog = skygen.biomes[prev_biome_name].colors.day_horizon
             else
-                prev_colorset.fog = skygen.biomes[prev_biome_name].colors.night_horizon
+                prev_colorset.fog = skygen.colorize(skygen.biomes[prev_biome_name].colors.night_horizon, {r=0,g=0,b=0}, skygen.night_darken_amount)
+                print("night color triggered for previous. Result: " .. dump(prev_colorset.fog))
             end
         end
-        colorset.sun_tint = skygen.biomes[biome_name].colors.sun_tint
-        colorset.moon_tint = skygen.biomes[biome_name].colors.moon_tint
         if fog then
             colorset.fog = skygen.biomes[biome_name].colors.fog
-        elseif fog_prev then
+        else
             if timeofday == "day" then
                 colorset.fog = skygen.biomes[biome_name].colors.day_horizon
             else
-                colorset.fog = skygen.biomes[biome_name].colors.night_horizon
+                colorset.fog = skygen.colorize(skygen.biomes[biome_name].colors.night_horizon, {r=0,g=0,b=0}, skygen.night_darken_amount)
+                print("night color triggered for current. Result: " .. dump(colorset.fog))
             end
         end
     else
         prev_colorset.sun_tint = skygen.biomes[prev_biome_name].event_colors.sun_tint
         prev_colorset.moon_tint = skygen.biomes[prev_biome_name].event_colors.moon_tint
+        colorset.sun_tint = skygen.biomes[biome_name].event_colors.sun_tint
+        colorset.moon_tint = skygen.biomes[biome_name].event_colors.moon_tint
         if fog_prev then
             prev_colorset.fog = skygen.biomes[prev_biome_name].event_colors.fog
-        elseif fog then
+        else
             if timeofday == "day" then
                 prev_colorset.fog = skygen.biomes[prev_biome_name].event_colors.day_horizon
             else
-                prev_colorset.fog = skygen.biomes[prev_biome_name].event_colors.night_horizon
+                prev_colorset.fog = skygen.colorize(skygen.biomes[prev_biome_name].event_colors.night_horizon, {r=0,g=0,b=0}, skygen.night_darken_amount)
             end
         end
-        colorset.sun_tint = skygen.biomes[biome_name].event_colors.sun_tint
-        colorset.moon_tint = skygen.biomes[biome_name].event_colors.moon_tint
         if fog then
             colorset.fog = skygen.biomes[biome_name].event_colors.fog
-        elseif fog_prev then
+        else
             if timeofday == "day" then
                 colorset.fog = skygen.biomes[biome_name].event_colors.day_horizon
             else
-                colorset.fog = skygen.biomes[biome_name].event_colors.night_horizon
+                colorset.fog = skygen.colorize(skygen.biomes[biome_name].event_colors.night_horizon, {r=0,g=0,b=0}, skygen.night_darken_amount)
             end
         end
     end

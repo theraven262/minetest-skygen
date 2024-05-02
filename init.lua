@@ -6,6 +6,7 @@ skygen.skybox_names = {}
 skygen.event_data = {}
 skygen.storage = minetest.get_mod_storage()
 skygen.tables_built = false
+skygen.night_darken_amount = 0.9 -- Amount of black to mix the night color with to approximate the actual night sky color
 
 local mods = minetest.get_modnames()
 skygen.is_edgy = false
