@@ -235,12 +235,14 @@ function skygen.get_color_diffs(prev_biome_name, biome_name)
     if (minetest.get_timeofday() > 0.25) and (minetest.get_timeofday() < 0.75) then
         timeofday = "day"
     end
-    print("Calculating transition from " .. prev_biome_name .. " to " .. biome_name .. "\n")
-    if fog then
-        print("Fog value is " .. dump(fog))
-    end
-    if fog_prev then
-        print("Previous fog value is " .. dump(fog_prev))
+    if skygen.debug then
+        print("Calculating transition from " .. prev_biome_name .. " to " .. biome_name .. "\n")
+        if fog then
+            print("Fog value is " .. dump(fog))
+        end
+        if fog_prev then
+            print("Previous fog value is " .. dump(fog_prev))
+        end
     end
     -- [Fog Interpolation]
     -- If the previous biome has fog and the next biome has fog then simply interpolate
@@ -260,7 +262,6 @@ function skygen.get_color_diffs(prev_biome_name, biome_name)
                 prev_colorset.fog = skygen.biomes[prev_biome_name].colors.day_horizon
             else
                 prev_colorset.fog = skygen.colorize(skygen.biomes[prev_biome_name].colors.night_horizon, {r=0,g=0,b=0}, skygen.night_darken_amount)
-                print("night color triggered for previous. Result: " .. dump(prev_colorset.fog))
             end
         end
         if fog then
@@ -270,7 +271,6 @@ function skygen.get_color_diffs(prev_biome_name, biome_name)
                 colorset.fog = skygen.biomes[biome_name].colors.day_horizon
             else
                 colorset.fog = skygen.colorize(skygen.biomes[biome_name].colors.night_horizon, {r=0,g=0,b=0}, skygen.night_darken_amount)
-                print("night color triggered for current. Result: " .. dump(colorset.fog))
             end
         end
     else

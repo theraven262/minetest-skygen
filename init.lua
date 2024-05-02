@@ -1,4 +1,5 @@
 skygen = {}
+skygen.debug = false
 skygen.sky_state = {}
 skygen.active_biome = {}
 skygen.skyboxes = {}
